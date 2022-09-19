@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:band_names_app/models/banda.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,7 +24,7 @@ class _HomePageState extends State<HomePage> {
         elevation: 1,
         title: Text(
           "Band names",
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.black87),
         ),
         backgroundColor: Colors.white,
       ),
@@ -29,7 +32,7 @@ class _HomePageState extends State<HomePage> {
           itemCount: bandas.length,
           itemBuilder: (context, i) => _bandaTile(bandas[i])),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: aniadirNuevaBanda,
         child: Icon(Icons.add),
         elevation: 1,
       ),
@@ -49,5 +52,67 @@ class _HomePageState extends State<HomePage> {
       ),
       onTap: () {},
     );
+  }
+
+  aniadirNuevaBanda() {
+    final textController = new TextEditingController();
+    if (Platform.isIOS) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Nombre de nueva banda"),
+            content: TextField(
+              controller: textController,
+            ),
+            actions: [
+              MaterialButton(
+                  elevation: 5,
+                  child: Text("Añadir"),
+                  textColor: Colors.blue,
+                  onPressed: () => aniadirBandaALista(textController.text))
+            ],
+          );
+        },
+      );
+    } else {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: Text('Nuevo nombre de banda'),
+            content: CupertinoTextField(
+              controller: textController,
+            ),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                child: Text("Añadir"),
+                onPressed: () => aniadirBandaALista(textController.text),
+              ),
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                child: Text(
+                  "Cerrar",
+                  style: TextStyle(color: Colors.red),
+                ),
+                onPressed: () => Navigator.pop(context),
+              )
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void aniadirBandaALista(String nombre) {
+    if (nombre.length > 1) {
+      this
+          .bandas
+          .add(Banda(id: DateTime.now().toString(), nombre: nombre, votes: 3));
+
+      setState(() {});
+    }
+    Navigator.pop(context);
   }
 }
