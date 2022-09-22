@@ -39,24 +39,38 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  ListTile _bandaTile(Banda banda) {
-    return ListTile(
-      leading: CircleAvatar(
-        child: Text(banda.nombre.substring(0, 2)),
-        backgroundColor: Colors.blue[100],
+  _bandaTile(Banda banda) {
+    return Dismissible(
+      direction: DismissDirection.startToEnd,
+      background: Container(
+        padding: EdgeInsets.only(left: 8.0),
+        color: Colors.red,
+        child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Borrar banda",
+              style: TextStyle(color: Colors.white),
+            )),
       ),
-      title: Text(banda.nombre),
-      trailing: Text(
-        '${banda.votes}',
-        style: TextStyle(fontSize: 20),
+      key: Key(banda.id),
+      child: ListTile(
+        leading: CircleAvatar(
+          child: Text(banda.nombre.substring(0, 2)),
+          backgroundColor: Colors.blue[100],
+        ),
+        title: Text(banda.nombre),
+        trailing: Text(
+          '${banda.votes}',
+          style: TextStyle(fontSize: 20),
+        ),
+        onTap: () {},
       ),
-      onTap: () {},
     );
   }
 
   aniadirNuevaBanda() {
     final textController = new TextEditingController();
-    if (Platform.isIOS) {
+    if (Platform.isAndroid) {
       showDialog(
         context: context,
         builder: (context) {
