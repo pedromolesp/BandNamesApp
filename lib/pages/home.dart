@@ -41,6 +41,11 @@ class _HomePageState extends State<HomePage> {
 
   _bandaTile(Banda banda) {
     return Dismissible(
+      onDismissed: (d) {
+        print('direction');
+        //TODO: llamar borrado en server
+        //siguiente seccion
+      },
       direction: DismissDirection.startToEnd,
       background: Container(
         padding: EdgeInsets.only(left: 8.0),
