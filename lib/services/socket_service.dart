@@ -29,6 +29,11 @@ class SocketService with ChangeNotifier {
       this._serverStatus = ServerStatus.Offline;
       notifyListeners();
     });
+
+    this._socket.on("active-bands", (payload) {
+      print(payload);
+    });
+
     this._socket.on("nuevo-mensaje", (payload) {
       print('Nuevo mensaje $payload');
       print('Nombre' + payload['nombre']);
