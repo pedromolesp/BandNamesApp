@@ -14,11 +14,31 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Banda> bandas = [
-    Banda(id: "1", nombre: "Linkin Park", votes: 5),
-    Banda(id: "2", nombre: "Sum 41", votes: 2),
-    Banda(id: "3", nombre: "Bon Jovi", votes: 2),
-    Banda(id: "4", nombre: "Evanescence", votes: 4),
+    // Banda(id: "1", name: "Linkin Park", vote: 5),
+    // Banda(id: "2", name: "Sum 41", vote: 2),
+    // Banda(id: "3", name: "Bon Jovi", vote: 2),
+    // Banda(id: "4", name: "Evanescence", vote: 4),
   ];
+
+  @override
+  void initState() {
+    final socketService = Provider.of<SocketService>(context, listen: false);
+    socketService.socket.on('active-bands', (payload) {
+      this.bandas =
+          (payload as List).map((band) => Banda.fromMap(band)).toList();
+      setState(() {});
+    });
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    final socketService = Provider.of<SocketService>(context, listen: false);
+
+    socketService.socket.off('active-bands');
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,12 +98,12 @@ class _HomePageState extends State<HomePage> {
       key: Key(banda.id),
       child: ListTile(
         leading: CircleAvatar(
-          child: Text(banda.nombre.substring(0, 2)),
+          child: Text(banda.name.substring(0, 2)),
           backgroundColor: Colors.blue[100],
         ),
-        title: Text(banda.nombre),
+        title: Text(banda.name),
         trailing: Text(
-          '${banda.votes}',
+          '${banda.vote}',
           style: TextStyle(fontSize: 20),
         ),
         onTap: () {},
@@ -146,7 +166,7 @@ class _HomePageState extends State<HomePage> {
     if (nombre.length > 1) {
       this
           .bandas
-          .add(Banda(id: DateTime.now().toString(), nombre: nombre, votes: 3));
+          .add(Banda(id: DateTime.now().toString(), name: nombre, vote: 3));
 
       setState(() {});
     }
