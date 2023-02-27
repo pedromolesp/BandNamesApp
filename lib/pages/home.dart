@@ -168,11 +168,8 @@ class _HomePageState extends State<HomePage> {
 
   void aniadirBandaALista(String nombre) {
     if (nombre.length > 1) {
-      this
-          .bandas
-          .add(Banda(id: DateTime.now().toString(), name: nombre, vote: 3));
-
-      setState(() {});
+      final socketService = Provider.of<SocketService>(context, listen: false);
+      socketService.socket.emit('create-band', {'name': nombre});
     }
     Navigator.pop(context);
   }
