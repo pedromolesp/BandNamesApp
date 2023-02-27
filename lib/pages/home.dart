@@ -78,6 +78,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   _bandaTile(Banda banda) {
+    final socketService = Provider.of<SocketService>(context, listen: false);
+
     return Dismissible(
       onDismissed: (d) {
         print('direction');
@@ -106,7 +108,9 @@ class _HomePageState extends State<HomePage> {
           '${banda.vote}',
           style: TextStyle(fontSize: 20),
         ),
-        onTap: () {},
+        onTap: () {
+          socketService.socket.emit('vote-band', {'id': banda.id});
+        },
       ),
     );
   }
