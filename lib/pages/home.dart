@@ -24,12 +24,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     final socketService = Provider.of<SocketService>(context, listen: false);
     socketService.socket.on('active-bands', (payload) {
-      this.bandas =
-          (payload as List).map((band) => Banda.fromMap(band)).toList();
-      setState(() {});
+      _handleActiveBands(payload);
     });
-
     super.initState();
+  }
+
+  _handleActiveBands(dynamic payload) {
+    this.bandas = (payload as List).map((band) => Banda.fromMap(band)).toList();
+    setState(() {});
   }
 
   @override
@@ -81,11 +83,8 @@ class _HomePageState extends State<HomePage> {
     final socketService = Provider.of<SocketService>(context, listen: false);
 
     return Dismissible(
-      onDismissed: (_) {
-        socketService.socket.emit('delete-band', {'id': banda.id});
-
-        //siguiente seccion
-      },
+      onDismissed: (_) =>
+          socketService.socket.emit('delete-band', {'id': banda.id}),
       direction: DismissDirection.startToEnd,
       background: Container(
         padding: EdgeInsets.only(left: 8.0),
@@ -108,9 +107,7 @@ class _HomePageState extends State<HomePage> {
           '${banda.vote}',
           style: TextStyle(fontSize: 20),
         ),
-        onTap: () {
-          socketService.socket.emit('vote-band', {'id': banda.id});
-        },
+        onTap: () => socketService.socket.emit('vote-band', {'id': banda.id}),
       ),
     );
   }
@@ -120,48 +117,44 @@ class _HomePageState extends State<HomePage> {
     if (Platform.isAndroid) {
       showDialog(
         context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Nombre de nueva banda"),
-            content: TextField(
-              controller: textController,
-            ),
-            actions: [
-              MaterialButton(
-                  elevation: 5,
-                  child: Text("Añadir"),
-                  textColor: Colors.blue,
-                  onPressed: () => aniadirBandaALista(textController.text))
-            ],
-          );
-        },
+        builder: (_) => AlertDialog(
+          title: Text("Nombre de nueva banda"),
+          content: TextField(
+            controller: textController,
+          ),
+          actions: [
+            MaterialButton(
+                elevation: 5,
+                child: Text("Añadir"),
+                textColor: Colors.blue,
+                onPressed: () => aniadirBandaALista(textController.text))
+          ],
+        ),
       );
     } else {
       showCupertinoDialog(
         context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: Text('Nuevo nombre de banda'),
-            content: CupertinoTextField(
-              controller: textController,
+        builder: (_) => CupertinoAlertDialog(
+          title: Text('Nuevo nombre de banda'),
+          content: CupertinoTextField(
+            controller: textController,
+          ),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: Text("Añadir"),
+              onPressed: () => aniadirBandaALista(textController.text),
             ),
-            actions: [
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                child: Text("Añadir"),
-                onPressed: () => aniadirBandaALista(textController.text),
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: Text(
+                "Cerrar",
+                style: TextStyle(color: Colors.red),
               ),
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                child: Text(
-                  "Cerrar",
-                  style: TextStyle(color: Colors.red),
-                ),
-                onPressed: () => Navigator.pop(context),
-              )
-            ],
-          );
-        },
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ),
       );
     }
   }
