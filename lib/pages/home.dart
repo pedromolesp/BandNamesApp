@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:band_names_app/models/banda.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pie_chart/pie_chart.dart';
 import 'package:provider/provider.dart';
 
 import '../services/socket_service.dart';
@@ -68,14 +69,22 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      body: ListView.builder(
-          itemCount: bandas.length,
-          itemBuilder: (context, i) => _bandaTile(bandas[i])),
+      body: Column(
+        children: [_buildGraph(), _buildList()],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: aniadirNuevaBanda,
         child: Icon(Icons.add),
         elevation: 1,
       ),
+    );
+  }
+
+  _buildList() {
+    return Expanded(
+      child: ListView.builder(
+          itemCount: bandas.length,
+          itemBuilder: (context, i) => _bandaTile(bandas[i])),
     );
   }
 
@@ -165,5 +174,49 @@ class _HomePageState extends State<HomePage> {
       socketService.socket.emit('create-band', {'name': nombre});
     }
     Navigator.pop(context);
+  }
+
+  _buildGraph() {
+    Map<String, double> dataMap = new Map();
+    bandas.forEach((band) {
+      dataMap.putIfAbsent(band.name, () => band.vote.toDouble());
+    });
+    final List<Color> colores = [
+      Colors.blue[50]!,
+      Colors.blue[200]!,
+      Colors.pink[50]!,
+      Colors.pink[200]!,
+      Colors.yellow[50]!,
+      Colors.yellow[200]!
+    ];
+    return Container(
+        width: double.infinity,
+        height: 200,
+        child: PieChart(
+          dataMap: dataMap,
+          animationDuration: Duration(milliseconds: 800),
+          chartLegendSpacing: 32,
+          colorList: colores,
+          initialAngleInDegree: 0,
+          ringStrokeWidth: 32,
+          legendOptions: LegendOptions(
+            showLegendsInRow: false,
+            legendPosition: LegendPosition.left,
+            showLegends: true,
+            legendShape: BoxShape.circle,
+            legendTextStyle: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          chartValuesOptions: ChartValuesOptions(
+            showChartValueBackground: true,
+            showChartValues: true,
+            showChartValuesInPercentage: false,
+            showChartValuesOutside: false,
+            decimalPlaces: 1,
+          ),
+          // gradientList: ---To add gradient colors---
+          // emptyColorGradient: ---Empty Color gradient---
+        ));
   }
 }
