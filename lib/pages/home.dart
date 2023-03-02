@@ -81,9 +81,9 @@ class _HomePageState extends State<HomePage> {
     final socketService = Provider.of<SocketService>(context, listen: false);
 
     return Dismissible(
-      onDismissed: (d) {
-        print('direction');
-        //TODO: llamar borrado en server
+      onDismissed: (_) {
+        socketService.socket.emit('delete-band', {'id': banda.id});
+
         //siguiente seccion
       },
       direction: DismissDirection.startToEnd,
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Colors.white),
             )),
       ),
-      key: Key(banda.id),
+      key: UniqueKey(),
       child: ListTile(
         leading: CircleAvatar(
           child: Text(banda.name.substring(0, 2)),
